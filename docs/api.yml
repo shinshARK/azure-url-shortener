@@ -1,0 +1,13 @@
+openapi: 3.0.0
+info:
+  title: URL Shortener API
+  version: 1.0.0
+paths:
+  /links:
+    post:
+      summary: Create a new short link
+      # ...
+  /{shortCode}:
+    get:
+      summary: Redirect to the long URL
+      # ...
