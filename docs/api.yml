@@ -6,8 +6,40 @@ paths:
   /links:
     post:
       summary: Create a new short link
-      # ...
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                longUrl:
+                  type: string
+                  example: "https://www.google.com"
+      responses:
+        '201':
+          description: Link created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shortCode:
+                    type: string
+                    example: "xyz123"
+                  longUrl:
+                    type: string
+                    example: "https://www.google.com"
+
   /{shortCode}:
     get:
       summary: Redirect to the long URL
-      # ...
+      parameters:
+        - name: shortCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirecting to the long URL
