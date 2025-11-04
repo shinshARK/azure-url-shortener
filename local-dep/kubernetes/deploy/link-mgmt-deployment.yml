@@ -1,0 +1,76 @@
+---
+# 1. The Deployment for your Python application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: link-mgmt-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: link-mgmt
+  template:
+    metadata:
+      labels:
+        app: link-mgmt
+    spec:
+      containers:
+      - name: link-mgmt-container
+        # This is the image we just built!
+        image: link-management-service:v1
+        
+        # --- CRITICAL ---
+        # This tells K8s: "Do NOT go to Docker Hub to find this image.
+        # Use the image I already have locally (in minikube's daemon)."
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - containerPort: 5000 # The port gunicorn runs on
+        
+        # Environment variables for your app.py
+        env:
+        - name: DB_HOST
+          # K8s internal DNS! This finds your SQL server.
+          value: "mssql-service" 
+        - name: DB_USER
+          value: "sa" # The user is 'sa'
+        - name: DB_PASSWORD
+          # Get the password from the secret
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secret
+              key: SA_PASSWORD
+              
+        # --- BEST PRACTICE ---
+        # Health checks for Kubernetes
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+# 2. The Service to expose your app
+apiVersion: v1
+kind: Service
+metadata:
+  name: link-management-service
+spec:
+  # --- CRITICAL ---
+  # 'NodePort' exposes this service to the *outside* world
+  # (i.e., your Arch machine) so you can curl it.
+  type: NodePort
+  selector:
+    app: link-mgmt # This matches the pod's label
+  ports:
+  - protocol: TCP
+    port: 5000       # Internal port (other pods call this)
+    targetPort: 5000 # Port on the pod
+    # nodePort: 30001 (You can specify one, or K8s will pick a random one)

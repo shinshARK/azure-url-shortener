@@ -1,0 +1,103 @@
+---
+# 1. The "Sleeping" Deployment
+# (This part is correct)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redirect-deployment
+spec:
+  replicas: 0 
+  selector:
+    matchLabels:
+      app: redirect
+  template:
+    metadata:
+      labels:
+        app: redirect
+    spec:
+      containers:
+      - name: redirect-container
+        image: redirect-service:v1 
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5001
+        env:
+        - name: DB_HOST
+          value: "mssql-service" 
+        - name: DB_USER
+          value: "sa"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secret
+              key: SA_PASSWORD
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: RABBITMQ_HOST
+          value: "rabbitmq-service"
+        - name: RABBITMQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_USER
+        - name: RABBITMQ_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_PASS
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+# 2. The Internal Service
+# (This part is correct)
+apiVersion: v1
+kind: Service
+metadata:
+  name: redirect-service-internal
+spec:
+  type: ClusterIP
+  selector:
+    app: redirect
+  ports:
+  - protocol: TCP
+    port: 5001
+    targetPort: 5001
+
+---
+# 3. The KEDA HTTP "Alarm Clock"
+# --- THIS IS THE CORRECTED v0.11.1 STRUCTURE ---
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: redirect-scaler
+spec:
+  hosts:
+  - "my-url-shortener.local"
+  
+  scaleTargetRef:
+    # These fields are correct for this version
+    name: redirect-deployment
+    kind: Deployment
+    apiVersion: apps/v1
+    service: redirect-service-internal
+    port: 5001
+
+  targetPendingRequests: 10
+
+  replicas:
+    min: 0
+    max: 5
+    
+  # --- THE 'cooldown:' BLOCK IS REMOVED ---
+  # It is not a valid field, and defaults are fine.

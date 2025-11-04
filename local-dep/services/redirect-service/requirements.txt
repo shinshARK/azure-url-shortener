@@ -1,0 +1,5 @@
+flask
+pyodbc
+gunicorn
+redis
+pika

@@ -1,0 +1,35 @@
+---
+# 1. The Deployment for the Redis pod
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        ports:
+        - containerPort: 6379 # The default Redis port
+
+---
+# 2. The Service to give Redis a stable network name
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  selector:
+    app: redis # This matches the label in the deployment's pod
+  ports:
+  - protocol: TCP
+    port: 6379       # The port other services will use
+    targetPort: 6379 # The port on the pod
