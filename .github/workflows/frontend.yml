@@ -63,6 +63,7 @@ jobs:
 
       - name: Deploy to AKS
         run: |
+          kubectl apply -f kubernetes/frontend/configmap.yaml
           kubectl apply -f kubernetes/frontend/deployment.yaml
           kubectl apply -f kubernetes/frontend/service.yaml
           kubectl rollout restart deployment/frontend-deployment
