@@ -64,4 +64,5 @@ jobs:
       - name: Deploy to AKS
         run: |
           kubectl apply -f kubernetes/auth-service/deployment.yaml
+          kubectl apply -f kubernetes/auth-service/service.yaml
           kubectl rollout restart deployment/auth-service-deployment

@@ -1,0 +1,138 @@
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/DepartureMono/DepartureMono-Regular.woff2') format('woff2'),
+    url('/fonts/DepartureMono/DepartureMono-Regular.woff') format('woff'),
+    url('/fonts/DepartureMono/DepartureMono-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  /* Departure Mono Theme Palette (Light/Elegant) */
+  --bg-color: #f4f4f0;
+  /* Off-white/Paper */
+  --text-color: #1a1a1a;
+  /* Dark Grey/Black */
+  --accent-color: #0044cc;
+  /* Azure Blue */
+  --grid-color: #e0e0e0;
+  /* Faint grey grid */
+  --font-family: 'Departure Mono', monospace;
+
+  font-family: var(--font-family);
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark Mode Support (Optional, keeping consistent with light theme elegance) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1a1a1a;
+    --text-color: #f4f4f0;
+    --accent-color: #4da6ff;
+    /* Lighter Azure */
+    --grid-color: #333333;
+  }
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+  /* Grid pattern */
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+button {
+  border-radius: 0;
+  /* Retro sharp corners */
+  border: 2px solid var(--accent-color);
+  padding: 0.6em 1.2em;
+  font-size: 1.2em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.1s;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px var(--accent-color);
+  /* Retro shadow */
+}
+
+button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--accent-color);
+}
+
+button:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+input {
+  font-family: inherit;
+  font-size: 1.2em;
+  padding: 0.5em;
+  border: 2px solid var(--accent-color);
+  background: transparent;
+  color: var(--text-color);
+  border-radius: 0;
+  margin-bottom: 1em;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.card {
+  padding: 2em;
+  border: 2px solid var(--accent-color);
+  background-color: var(--bg-color);
+  position: relative;
+}
+
+a {
+  font-weight: 500;
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+a:hover {
+  text-decoration: none;
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+}

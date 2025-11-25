@@ -1,0 +1,20 @@
+# Ignore the massive build folder
+target/
+target
+
+# Ignore source code (only need the binary)
+src/
+Cargo.toml
+Cargo.lock
+Makefile
+Dockerfile
+
+# Ignore Git
+.git/
+.gitignore
+
+# Ignore local settings (security)
+local.settings.json
+.vscode/
+__pycache__/
+.venv/
