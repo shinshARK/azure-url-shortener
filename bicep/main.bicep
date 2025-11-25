@@ -1,35 +1,36 @@
-// File ini dijalankan di level Subscription untuk membuat Resource Group.
+// File: bicep/main.bicep
 targetScope = 'subscription'
 
 // === Parameter ===
 param location string = 'southeastasia'
 param projectPrefix string = 'us'
-param principalId string // ID pengguna yang menjalankan deployment.
+param principalId string 
+@secure()
+param sqlAdminPassword string // RECEIVE the password here
 
 // === Variabel ===
 var resourceGroupName = 'rg-${projectPrefix}-prod'
 
 // === Resource Group ===
-// Membuat Resource Group utama untuk proyek ini.
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: resourceGroupName
   location: location
 }
 
 // === Module ===
-// Mendeploy file 'core.bicep' ke dalam Resource Group yang baru dibuat.
 module coreResources 'core.bicep' = {
   name: 'CoreResourcesDeployment'
-  scope: rg // Menentukan target deployment adalah Resource Group 'rg'.
+  scope: rg 
   params: {
     location: location
     projectPrefix: projectPrefix
     principalId: principalId
+    sqlAdminPassword: sqlAdminPassword // PASS it down here
   }
 }
 
 // === Outputs ===
-// Menampilkan informasi penting setelah deployment selesai.
 output keyVaultName string = coreResources.outputs.keyVaultName
 output aksClusterName string = coreResources.outputs.aksClusterName
-output aksResourceId string = coreResources.outputs.aksResourceId
+output sqlServerName string = coreResources.outputs.sqlServerName
+output cosmosAccountName string = coreResources.outputs.cosmosAccountName
