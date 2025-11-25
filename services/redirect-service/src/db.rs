@@ -10,8 +10,11 @@ pub async fn get_original_url(short_code: &str) -> Result<Option<String>> {
     println!("DEBUG: Querying for ShortCode: '{}'", short_code); // 'Quotes' reveal spaces
 
     let conn_str = env::var("SqlConnectionString")?;
-    let config = Config::from_ado_string(&conn_str)?;
+    let mut config = Config::from_ado_string(&conn_str)?;
 
+    config.encryption(tiberius::EncryptionLevel::Required);
+    config.trust_cert(); // Trust Azure's certificate
+                         //
     let tcp = TcpStream::connect(config.get_addr()).await?;
     tcp.set_nodelay(true)?;
     
