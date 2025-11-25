@@ -57,7 +57,7 @@ jobs:
               spec:
                 containers:
                 - name: sqlcmd
-                  image: mcr.microsoft.com/mssql/server:2022-latest
+                  image: mcr.microsoft.com/mssql-tools
                   command: ["/bin/bash", "-c"]
                   args:
                     - |
@@ -82,5 +82,14 @@ jobs:
                     name: db-init-script
           EOF
 
-          # Wait for Job to complete
-          kubectl wait --for=condition=complete job/db-migration-job --timeout=60s
+          # Wait for Job to complete (increased timeout to 5m)
+          kubectl wait --for=condition=complete job/db-migration-job --timeout=300s
+
+      - name: Debug on Failure
+        if: failure()
+        run: |
+          echo "Job failed or timed out. Checking status..."
+          kubectl get jobs db-migration-job
+          kubectl get pods -l job-name=db-migration-job
+          kubectl describe pods -l job-name=db-migration-job
+          kubectl logs -l job-name=db-migration-job --tail=100
