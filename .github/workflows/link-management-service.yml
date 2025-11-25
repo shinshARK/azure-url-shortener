@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'services/link-management-service/**' # Only triggers on source code changes
-      - 'k8s/link-management-service/**'      # Only triggers on config changes
+      - 'kubernetes/link-management-service/**'      # Only triggers on config changes
 
 env:
   REGISTRY: ghcr.io
