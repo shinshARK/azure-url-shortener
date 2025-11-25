@@ -8,6 +8,10 @@
         reverse_proxy http://link-management-service
     }
 
+    handle /api/analytics* {
+        reverse_proxy http://analytics-query-service:3001
+    }
+
     # Frontend - Fallback for everything else
     handle {
         root * /srv
