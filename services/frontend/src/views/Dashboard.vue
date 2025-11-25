@@ -69,7 +69,8 @@ const logout = () => {
 }
 
 const copyToClipboard = async (shortCode) => {
-  const url = `https://us-func-p6ndmuotrzo5a.azurewebsites.net/api/${shortCode}`
+  // Use the custom domain (Root Level)
+  const url = `${window.location.origin}/${shortCode}`
   
   try {
     if (navigator.clipboard && window.isSecureContext) {
