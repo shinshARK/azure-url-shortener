@@ -47,7 +47,7 @@ pub async fn handle_redirect(Path(short_code): Path<String>, req: Request) -> Re
         Ok(None) => (axum::http::StatusCode::NOT_FOUND, "Link not found").into_response(),
         Err(e) => {
             eprintln!("DB Error: {}", e);
-            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "Database Error").into_response()
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, format!("DB Failure: {:?}", e)).into_response()
         }
     }
 }
