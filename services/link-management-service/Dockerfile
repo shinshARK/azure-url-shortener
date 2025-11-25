@@ -1,12 +1,26 @@
-FROM node:18-alpine
+# Build Stage
+FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --production
+# Copy go mod and sum files
+COPY go.mod ./
+# COPY go.sum ./
+RUN go mod download
 
-COPY src/ ./src/
+# Copy source code
+COPY . .
 
-EXPOSE 5000
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o link-service ./cmd/server
 
-CMD ["npm", "start"]
+# Production Stage
+FROM gcr.io/distroless/static-debian12
+
+WORKDIR /app
+
+COPY --from=builder /app/link-service .
+
+EXPOSE 8080
+
+CMD ["./link-service"]
