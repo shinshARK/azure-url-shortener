@@ -1,0 +1,18 @@
+{
+  "name": "analytics-processing-service",
+  "version": "1.0.0",
+  "description": "Consumes analytics events from Service Bus and writes to Cosmos DB",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.0.0",
+    "@azure/service-bus": "^7.9.0",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

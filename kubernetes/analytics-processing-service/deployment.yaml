@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-processing-deployment
+  labels:
+    app: analytics-processing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics-processing-service
+  template:
+    metadata:
+      labels:
+        app: analytics-processing-service
+    spec:
+      containers:
+      - name: analytics-processing-service
+        image: ghcr.io/shinshark/azure-url-shortener/analytics-processing-service:latest
+        imagePullPolicy: Always
+        env:
+        - name: SERVICE_BUS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: analytics-secrets
+              key: service-bus-connection-string
+        - name: COSMOS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: analytics-secrets
+              key: cosmos-connection-string
+        - name: COSMOS_DATABASE_NAME
+          value: "analytics-db"
+        - name: COSMOS_CONTAINER_NAME
+          value: "clicks"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
