@@ -20,7 +20,8 @@ const fetchLinks = async () => {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     if (response.ok) {
-      links.value = await response.json()
+      const data = await response.json()
+      links.value = data || [] // Handle null response
     }
   } catch (e) {
     console.error(e)
