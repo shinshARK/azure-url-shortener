@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'services/link-management-service/**' # Only triggers on source code changes
-      - 'k8s/link-management-service/**'      # Only triggers on config changes
+      - 'kubernetes/link-management-service/**'      # Only triggers on config changes
 
 env:
   REGISTRY: ghcr.io
@@ -71,7 +71,7 @@ jobs:
       - name: Deploy to AKS
         run: |
           # Apply the deployment file
-          kubectl apply -f k8s/link-management-service/deployment.yaml
+          kubectl apply -f kubernetes/link-management-service/deployment.yaml
           
           # Force the pods to restart so they pull the new image
           kubectl rollout restart deployment/link-management-deployment
