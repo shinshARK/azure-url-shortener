@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: link-management-deployment
+  labels:
+    app: link-management-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: link-management-service
+  template:
+    metadata:
+      labels:
+        app: link-management-service
+    spec:
+      containers:
+      - name: link-management-service
+        image: ghcr.io/shinshARK/azure-url-shortener/link-management-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        env:
+        - name: KEY_VAULT_NAME
+          value: "us-kv-p6ndmuotrzo5a"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
