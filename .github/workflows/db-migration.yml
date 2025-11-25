@@ -1,0 +1,86 @@
+name: DB Migration Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'services/auth-service/init.sql'
+      # Add other SQL files here as needed
+
+env:
+  RESOURCE_GROUP: rg-us-prod
+  CLUSTER_NAME: us-aks-p6ndmuotrzo5a
+
+jobs:
+  run-migration:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          cluster-name: ${{ env.CLUSTER_NAME }}
+
+      - name: Run SQL Migration in AKS
+        run: |
+          # Create a ConfigMap with the SQL scripts
+          kubectl create configmap db-init-script \
+            --from-file=auth-init.sql=services/auth-service/init.sql \
+            --from-file=link-init.sql=services/link-management-service/init.sql \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          # Delete existing job if any
+          kubectl delete job db-migration-job --ignore-not-found
+
+          # Create a Job to run the SQL
+          cat <<EOF | kubectl apply -f -
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: db-migration-job
+          spec:
+            ttlSecondsAfterFinished: 600
+            template:
+              spec:
+                containers:
+                - name: sqlcmd
+                  image: mcr.microsoft.com/mssql/server:2022-latest
+                  command: ["/bin/bash", "-c"]
+                  args:
+                    - |
+                      # Run Auth Service Init
+                      /opt/mssql-tools/bin/sqlcmd -S us-sql-p6ndmuotrzo5a.database.windows.net -U sqladmin -P "\$DB_PASSWORD" -d links-db -i /scripts/auth-init.sql
+                      
+                      # Run Link Service Init
+                      /opt/mssql-tools/bin/sqlcmd -S us-sql-p6ndmuotrzo5a.database.windows.net -U sqladmin -P "\$DB_PASSWORD" -d links-db -i /scripts/link-init.sql
+                  env:
+                  - name: DB_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: db-secrets
+                        key: password
+                  volumeMounts:
+                  - name: script-volume
+                    mountPath: /scripts
+                restartPolicy: Never
+                volumes:
+                - name: script-volume
+                  configMap:
+                    name: db-init-script
+          EOF
+
+          # Wait for Job to complete
+          kubectl wait --for=condition=complete job/db-migration-job --timeout=60s

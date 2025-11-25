@@ -1,32 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: link-management-deployment
+  name: auth-service-deployment
   labels:
-    app: link-management-service
+    app: auth-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: link-management-deployment
-  labels:
-    app: link-management-service
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: link-management-service
+      app: auth-service
   template:
     metadata:
       labels:
-        app: link-management-service
+        app: auth-service
     spec:
       containers:
-      - name: link-management-service
-        image: ghcr.io/shinshark/azure-url-shortener/link-management-service:latest
+      - name: auth-service
+        image: ghcr.io/shinshark/azure-url-shortener/auth-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -34,7 +24,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: DB_HOST
-          value: "us-sql-p6ndmuotrzo5a.database.windows.net"
+          value: "us-sql-p6ndmuotrzo5a.database.windows.net" # TODO: Verify this hostname pattern from Bicep output or user
         - name: DB_NAME
           value: "links-db"
         - name: DB_USER

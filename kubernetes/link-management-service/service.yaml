@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: link-management-service
+  labels:
+    app: link-management-service
+spec:
+  selector:
+    app: link-management-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
