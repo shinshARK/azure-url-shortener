@@ -3,6 +3,12 @@ const express = require('express');
 const { CosmosClient } = require("@azure/cosmos");
 const UAParser = require('ua-parser-js');
 const cors = require('cors');
+const crypto = require('crypto');
+
+// Polyfill for Cosmos DB SDK on Node < 19
+if (!global.crypto) {
+    global.crypto = crypto;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
