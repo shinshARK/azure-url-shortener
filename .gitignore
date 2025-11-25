@@ -16,8 +16,6 @@ docs/url-shortener.pdf:Zone.Identifier
 # Go Binaries
 server
 server.exe
-auth-service
-link-service
 *.exe
 *.test
 docs/url-shortener.pdfZone.Identifier
