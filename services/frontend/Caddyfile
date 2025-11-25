@@ -1,10 +1,10 @@
 :80 {
     # API Routes - Priority Handling
-    handle /api/auth/* {
+    handle /api/auth* {
         reverse_proxy http://auth-service
     }
 
-    handle /api/links/* {
+    handle /api/links* {
         reverse_proxy http://link-management-service
     }
 

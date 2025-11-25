@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-caddy-config
+  labels:
+    app: frontend
+data:
+  Caddyfile: |
+    :80 {
+        # API Routes - Priority Handling
+        handle /api/auth* {
+            reverse_proxy http://auth-service
+        }
+
+        handle /api/links* {
+            reverse_proxy http://link-management-service
+        }
+
+        # Frontend - Fallback for everything else
+        handle {
+            root * /srv
+            try_files {path} /index.html
+            file_server
+        }
+    }
