@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: link-management-service
-        image: ghcr.io/shinshARK/azure-url-shortener/link-management-service:latest
+        image: ghcr.io/shinshark/azure-url-shortener/link-management-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
