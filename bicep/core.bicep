@@ -7,21 +7,8 @@ param projectPrefix string
 param principalId string
 
 // === Variabel ===
-var containerRegistryName = '${projectPrefix}acr${uniqueString(resourceGroup().id)}'
 var keyVaultName = '${projectPrefix}-kv-${uniqueString(resourceGroup().id)}'
-
-// === Azure Container Registry (ACR) ===
-// Tempat untuk menyimpan Docker image Anda.
-resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
-  name: containerRegistryName
-  location: location
-  sku: {
-    name: 'Basic'
-  }
-  properties: {
-    adminUserEnabled: true
-  }
-}
+var aksClusterName = '${projectPrefix}-aks-${uniqueString(resourceGroup().id)}'
 
 // === Azure Key Vault ===
 // Brankas aman untuk menyimpan semua secret aplikasi.
@@ -46,7 +33,34 @@ resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
   }
 }
 
+// === Azure Kubernetes Service (AKS) ===
+// Cluster Kubernetes untuk menjalankan container aplikasi.
+resource aks 'Microsoft.ContainerService/managedClusters@2024-01-01' = {
+  name: aksClusterName
+  location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    dnsPrefix: '${projectPrefix}-aks'
+    agentPoolProfiles: [
+      {
+        name: 'agentpool'
+        count: 2
+        vmSize: 'Standard_B2s'  // Small VM for demo/dev
+        mode: 'System'
+        osType: 'Linux'
+      }
+    ]
+    networkProfile: {
+      networkPlugin: 'azure'
+      loadBalancerSku: 'standard'
+    }
+  }
+}
+
 // === Outputs ===
 // Mengirimkan nilai kembali ke 'main.bicep' untuk ditampilkan.
-output acrLoginServer string = acr.properties.loginServer
 output keyVaultName string = kv.name
+output aksClusterName string = aks.name
+output aksResourceId string = aks.id

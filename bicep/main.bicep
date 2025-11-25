@@ -30,5 +30,6 @@ module coreResources 'core.bicep' = {
 
 // === Outputs ===
 // Menampilkan informasi penting setelah deployment selesai.
-output acrLoginServer string = coreResources.outputs.acrLoginServer
 output keyVaultName string = coreResources.outputs.keyVaultName
+output aksClusterName string = coreResources.outputs.aksClusterName
+output aksResourceId string = coreResources.outputs.aksResourceId
