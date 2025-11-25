@@ -127,3 +127,4 @@ output keyVaultName string = kv.name
 output aksClusterName string = aks.name
 output sqlServerName string = sqlServer.name
 output cosmosAccountName string = cosmosAccount.name
+
