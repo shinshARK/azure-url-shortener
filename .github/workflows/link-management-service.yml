@@ -73,6 +73,7 @@ jobs:
         run: |
           # Apply the deployment file
           kubectl apply -f kubernetes/link-management-service/deployment.yaml
+          kubectl apply -f kubernetes/link-management-service/service.yaml
           
           # Force the pods to restart so they pull the new image
           kubectl rollout restart deployment/link-management-deployment

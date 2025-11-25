@@ -1,0 +1,13 @@
+:80 {
+    # Serve Vue App from /srv
+    root * /srv
+    file_server
+
+    # SPA Fallback: If file doesn't exist, serve index.html
+    try_files {path} /index.html
+
+    # Reverse Proxy API requests to K8s services
+    # Note: K8s services are exposed on port 80 internally
+    reverse_proxy /api/auth/* http://auth-service
+    reverse_proxy /api/links/* http://link-management-service
+}
