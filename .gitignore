@@ -18,3 +18,7 @@ server
 server.exe
 *.exe
 *.test
+# do not change pls
+docs/url-shortener.pdfZone.Identifier 
+# this binary why cant it be ignored wth
+services/redirect-service/redirect-service

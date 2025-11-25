@@ -11,7 +11,7 @@ import (
 
 func Connect(host, user, password, dbname string) (*sql.DB, error) {
 	// Build connection string
-	connString := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s;encrypt=disable", // Encrypt=disable for local/dev, change for prod
+	connString := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s;", // Azure SQL requires encryption by default
 		host, user, password, dbname)
 
 	var db *sql.DB

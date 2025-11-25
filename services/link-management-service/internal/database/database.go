@@ -11,7 +11,7 @@ import (
 
 func Connect(host, user, password, dbname string) (*sql.DB, error) {
 	// Build connection string
-	connString := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s;encrypt=disable",
+	connString := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s;",
 		host, user, password, dbname)
 
 	var db *sql.DB
