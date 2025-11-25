@@ -6,7 +6,7 @@ metadata:
     app: frontend
 data:
   Caddyfile: |
-    lazarune.shinshark.my.id {
+    lazurune.shinshark.my.id {
         # 1. API Routes
         handle /api/auth* {
             reverse_proxy http://auth-service
