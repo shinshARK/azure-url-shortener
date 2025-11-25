@@ -68,11 +68,35 @@ const logout = () => {
   router.push('/login')
 }
 
-const copyToClipboard = (shortCode) => {
-  // Use the Azure Function URL for the short link
+const copyToClipboard = async (shortCode) => {
   const url = `https://us-func-p6ndmuotrzo5a.azurewebsites.net/api/${shortCode}`
-  navigator.clipboard.writeText(url)
-  alert('COPIED: ' + url)
+  
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(url)
+    } else {
+      // Fallback for HTTP/Insecure contexts
+      const textArea = document.createElement("textarea")
+      textArea.value = url
+      textArea.style.position = "fixed"
+      textArea.style.left = "-9999px"
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      
+      try {
+        document.execCommand('copy')
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err)
+      }
+      
+      document.body.removeChild(textArea)
+    }
+    alert('COPIED: ' + url)
+  } catch (err) {
+    console.error('Failed to copy: ', err)
+    alert('Failed to copy to clipboard. Please copy manually: ' + url)
+  }
 }
 
 onMounted(fetchLinks)
