@@ -145,7 +145,10 @@ onMounted(fetchLinks)
             <span class="alias">/{{ link.shortCode }}</span>
             <span class="target">{{ link.originalUrl }}</span>
           </div>
-          <button @click="copyToClipboard(link.shortCode)">COPY</button>
+          <div class="actions">
+            <button @click="router.push(`/analytics/${link.shortCode}`)" class="analytics-btn">ANALYTICS</button>
+            <button @click="copyToClipboard(link.shortCode)">COPY</button>
+          </div>
         </div>
       </div>
     </div>
@@ -157,6 +160,32 @@ onMounted(fetchLinks)
   max-width: 800px;
   margin: 0 auto;
   text-align: left;
+}
+/* ... existing styles ... */
+.link-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--grid-color);
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.analytics-btn {
+  background: transparent;
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+}
+
+.analytics-btn:hover {
+  background: var(--accent-color);
+  color: white;
 }
 
 header {
