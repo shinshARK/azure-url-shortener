@@ -10,3 +10,14 @@ local.settings.json
 .vscode/
 .idea/
 .DS_Store
+
+docs/url-shortener.pdf:Zone.Identifier
+
+# Go Binaries
+server
+server.exe
+auth-service
+link-service
+*.exe
+*.test
+docs/url-shortener.pdfZone.Identifier
