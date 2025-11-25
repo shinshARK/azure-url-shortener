@@ -15,5 +15,6 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
+  console.log("Starting service...")
   console.log(`Link Management Service running on port ${PORT}`);
 });
