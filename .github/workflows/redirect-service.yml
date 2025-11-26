@@ -2,9 +2,7 @@ name: Redirect Service Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [ main ]
     paths:
       - 'services/redirect-service/**' # Only run when this specific service changes
 
