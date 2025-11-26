@@ -6,8 +6,12 @@ const router = useRouter()
 const username = ref('')
 const password = ref('')
 const error = ref('')
+const errors = ref({})
 
 const login = async () => {
+  error.value = ''
+  errors.value = {}
+
   try {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
@@ -16,6 +20,14 @@ const login = async () => {
     })
 
     if (!response.ok) {
+      const data = await response.json()
+      if (data.errors) {
+        errors.value = data.errors
+        return
+      }
+      if (data.error) {
+        throw new Error(data.error)
+      }
       throw new Error('Login failed')
     }
 
@@ -23,7 +35,7 @@ const login = async () => {
     localStorage.setItem('token', data.token)
     router.push('/dashboard')
   } catch (e) {
-    error.value = 'Invalid credentials'
+    error.value = e.message
   }
 }
 </script>
@@ -35,10 +47,12 @@ const login = async () => {
       <div class="form-group">
         <label>IDENTITY</label>
         <input v-model="username" type="text" placeholder="USERNAME" required />
+        <span v-if="errors.Username" class="field-error">{{ errors.Username }}</span>
       </div>
       <div class="form-group">
         <label>PASSPHRASE</label>
         <input v-model="password" type="password" placeholder="PASSWORD" required />
+        <span v-if="errors.Password" class="field-error">{{ errors.Password }}</span>
       </div>
       <button type="submit">AUTHENTICATE</button>
     </form>
@@ -65,6 +79,13 @@ label {
 .error {
   color: #ff0000;
   margin-top: 1rem;
+}
+
+.field-error {
+  color: #ff0000;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 .footer {
