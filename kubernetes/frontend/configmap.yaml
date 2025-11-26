@@ -6,6 +6,10 @@ metadata:
     app: frontend
 data:
   Caddyfile: |
+    {
+        email jidanabdurahman@gmail.com
+        acme_ca https://acme.zerossl.com/v2/DV90
+    }
     lazurune.shinshark.my.id {
         # 1. API Routes
         handle /api/auth* {
@@ -14,6 +18,10 @@ data:
 
         handle /api/links* {
             reverse_proxy http://link-management-service
+        }
+
+        handle /api/analytics* {
+            reverse_proxy http://analytics-query-service:3001
         }
 
         # 2. Frontend Assets & Routes (Explicit Whitelist)
