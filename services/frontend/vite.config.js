@@ -13,6 +13,10 @@ export default defineConfig({
       '/api/links': {
         target: 'http://localhost:8081',
         changeOrigin: true,
+      },
+      '/api/analytics': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
       }
     }
   }

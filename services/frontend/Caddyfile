@@ -8,6 +8,11 @@
         reverse_proxy http://link-management-service
     }
 
+    # Explicitly match the analytics route
+    handle /api/analytics/* {
+        reverse_proxy http://analytics-query-service:3001
+    }
+
     # Frontend - Fallback for everything else
     handle {
         root * /srv

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Dashboard from '../views/Dashboard.vue'
+import Analytics from '../views/Analytics.vue'
 
 const routes = [
   {
@@ -23,6 +24,12 @@ const routes = [
     name: 'Dashboard',
     component: Dashboard,
     meta: { requiresAuth: false } // Allow guests
+  },
+  {
+    path: '/analytics/:shortCode',
+    name: 'Analytics',
+    component: Analytics,
+    meta: { requiresAuth: true }
   }
 ]
 
