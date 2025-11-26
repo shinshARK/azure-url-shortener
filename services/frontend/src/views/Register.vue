@@ -6,8 +6,12 @@ const router = useRouter()
 const username = ref('')
 const password = ref('')
 const error = ref('')
+const errors = ref({})
 
 const register = async () => {
+  error.value = ''
+  errors.value = {}
+  
   try {
     const response = await fetch('/api/auth/register', {
       method: 'POST',
@@ -16,6 +20,14 @@ const register = async () => {
     })
 
     if (!response.ok) {
+      const data = await response.json()
+      if (data.errors) {
+        errors.value = data.errors
+        return
+      }
+      if (data.error) {
+        throw new Error(data.error)
+      }
       throw new Error('Registration failed')
     }
 
@@ -30,7 +42,7 @@ const register = async () => {
     localStorage.setItem('token', data.token)
     router.push('/dashboard')
   } catch (e) {
-    error.value = 'Registration failed. Username might be taken.'
+    error.value = e.message
   }
 }
 </script>
@@ -42,10 +54,12 @@ const register = async () => {
       <div class="form-group">
         <label>IDENTITY</label>
         <input v-model="username" type="text" placeholder="USERNAME" required />
+        <span v-if="errors.Username" class="field-error">{{ errors.Username }}</span>
       </div>
       <div class="form-group">
         <label>PASSPHRASE</label>
         <input v-model="password" type="password" placeholder="PASSWORD" required />
+        <span v-if="errors.Password" class="field-error">{{ errors.Password }}</span>
       </div>
       <button type="submit">INITIALIZE</button>
     </form>
@@ -72,6 +86,13 @@ label {
 .error {
   color: #ff0000;
   margin-top: 1rem;
+}
+
+.field-error {
+  color: #ff0000;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 .footer {
