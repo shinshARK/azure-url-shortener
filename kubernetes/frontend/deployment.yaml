@@ -32,7 +32,12 @@ spec:
         - name: caddy-config
           mountPath: /etc/caddy/Caddyfile
           subPath: Caddyfile
+        - name: caddy-data
+          mountPath: /data
       volumes:
       - name: caddy-config
         configMap:
           name: frontend-caddy-config
+      - name: caddy-data
+        persistentVolumeClaim:
+          claimName: caddy-data-pvc
