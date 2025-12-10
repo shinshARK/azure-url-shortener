@@ -82,3 +82,36 @@ func (r *LinkRepository) DeleteLink(code string) error {
 	_, err := r.DB.Exec(query, code)
 	return err
 }
+
+func (r *LinkRepository) CountCustomLinksByUserID(userID int) (int, error) {
+	query := "SELECT COUNT(*) FROM Links WHERE UserID = @p1 AND CustomAlias IS NOT NULL AND CustomAlias <> ''"
+	var count int
+	err := r.DB.QueryRow(query, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *LinkRepository) CountStandardLinksByUserID(userID int) (int, error) {
+	query := "SELECT COUNT(*) FROM Links WHERE UserID = @p1 AND (CustomAlias IS NULL OR CustomAlias = '')"
+	var count int
+	err := r.DB.QueryRow(query, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *LinkRepository) UpdateLink(link *models.Link) error {
+	query := `
+		UPDATE Links
+		SET OriginalUrl = @p1
+		WHERE ShortCode = @p2
+	`
+	_, err := r.DB.Exec(query, link.OriginalUrl, link.ShortCode)
+	if err != nil {
+		return fmt.Errorf("failed to update link: %w", err)
+	}
+	return nil
+}

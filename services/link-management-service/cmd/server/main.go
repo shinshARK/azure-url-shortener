@@ -48,6 +48,7 @@ func main() {
 		api.POST("", h.CreateLink)
 		api.GET("", h.GetMyLinks)
 		api.DELETE("/:code", h.DeleteLink)
+		api.PUT("/:code", h.UpdateLink)
 	}
 
 	// Start server

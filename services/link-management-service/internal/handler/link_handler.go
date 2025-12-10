@@ -87,3 +87,39 @@ func (h *LinkHandler) DeleteLink(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Link deleted"})
 }
+
+func (h *LinkHandler) UpdateLink(c *gin.Context) {
+	shortCode := c.Param("code")
+	var req models.UpdateLinkRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	role := c.GetString("role")
+
+	link, err := h.Service.UpdateLink(shortCode, &req, userID.(int), role)
+	if err != nil {
+		if err.Error() == "unauthorized" {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You do not own this link"})
+			return
+		}
+		if err.Error() == "link not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Link not found"})
+			return
+		}
+		if err.Error() == "only custom alias links can be edited" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, link)
+}

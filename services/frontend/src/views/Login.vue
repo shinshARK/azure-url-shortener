@@ -33,6 +33,7 @@ const login = async () => {
 
     const data = await response.json()
     localStorage.setItem('token', data.token)
+    localStorage.setItem('username', username.value)
     router.push('/dashboard')
   } catch (e) {
     error.value = e.message
