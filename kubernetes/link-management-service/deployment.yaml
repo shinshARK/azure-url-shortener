@@ -8,16 +8,6 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: link-management-deployment
-  labels:
-    app: link-management-service
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
       app: link-management-service
   template:
     metadata:
@@ -49,6 +39,8 @@ spec:
             secretKeyRef:
               name: auth-secrets
               key: jwt-secret
+        - name: CACHE_EVICTION_URL
+          value: "https://us-func-p6ndmuotrzo5a.azurewebsites.net/api/cache"
         resources:
           requests:
             cpu: "100m"
