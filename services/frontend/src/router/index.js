@@ -3,6 +3,7 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Analytics from '../views/Analytics.vue'
+import NotFound from '../views/NotFound.vue'
 
 const routes = [
   {
@@ -30,6 +31,15 @@ const routes = [
     name: 'Analytics',
     component: Analytics,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/not-found',
+    name: 'NotFound',
+    component: NotFound
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/not-found'
   }
 ]
 
