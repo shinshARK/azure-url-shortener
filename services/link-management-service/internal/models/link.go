@@ -17,3 +17,7 @@ type CreateLinkRequest struct {
 	OriginalUrl string `json:"originalUrl" binding:"required,url"` // Renamed from LongUrl
 	CustomAlias string `json:"customAlias"`
 }
+
+type UpdateLinkRequest struct {
+	OriginalUrl string `json:"originalUrl" binding:"required,url"`
+}

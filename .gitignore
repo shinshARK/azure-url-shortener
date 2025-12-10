@@ -14,7 +14,7 @@ local.settings.json
 docs/url-shortener.pdf:Zone.Identifier
 
 # Go Binaries
-server
+/server
 server.exe
 *.exe
 *.test

@@ -20,12 +20,24 @@ func NewLinkService(repo *repository.LinkRepository) *LinkService {
 func (s *LinkService) CreateLink(req *models.CreateLinkRequest, userID *int, role string) (*models.Link, error) {
 	// 1. Quota Check for Users
 	if role == "User" && userID != nil {
-		count, err := s.Repo.CountLinksByUserID(*userID)
-		if err != nil {
-			return nil, err
-		}
-		if count >= 10 { // Hardcoded quota for now
-			return nil, errors.New("quota exceeded: max 10 links allowed")
+		if req.CustomAlias != "" {
+			// Custom Link Quota
+			count, err := s.Repo.CountCustomLinksByUserID(*userID)
+			if err != nil {
+				return nil, err
+			}
+			if count >= 2 {
+				return nil, errors.New("quota exceeded: max 2 custom links allowed")
+			}
+		} else {
+			// Standard Link Quota
+			count, err := s.Repo.CountStandardLinksByUserID(*userID)
+			if err != nil {
+				return nil, err
+			}
+			if count >= 20 {
+				return nil, errors.New("quota exceeded: max 20 standard links allowed")
+			}
 		}
 	}
 
@@ -79,6 +91,35 @@ func (s *LinkService) CreateLink(req *models.CreateLinkRequest, userID *int, rol
 
 func (s *LinkService) GetUserLinks(userID int) ([]models.Link, error) {
 	return s.Repo.GetLinksByUserID(userID)
+}
+
+func (s *LinkService) UpdateLink(shortCode string, req *models.UpdateLinkRequest, userID int, role string) (*models.Link, error) {
+	link, err := s.Repo.GetLinkByShortCode(shortCode)
+	if err != nil {
+		return nil, err
+	}
+	if link == nil {
+		return nil, errors.New("link not found")
+	}
+
+	// Authorization Check
+	if role != "Admin" {
+		if link.UserID == nil || *link.UserID != userID {
+			return nil, errors.New("unauthorized")
+		}
+	}
+
+	// Validation: Only custom alias links can be edited
+	if link.CustomAlias == "" {
+		return nil, errors.New("only custom alias links can be edited")
+	}
+
+	link.OriginalUrl = req.OriginalUrl
+	if err := s.Repo.UpdateLink(link); err != nil {
+		return nil, err
+	}
+
+	return link, nil
 }
 
 func (s *LinkService) DeleteLink(shortCode string, userID int, role string) error {
