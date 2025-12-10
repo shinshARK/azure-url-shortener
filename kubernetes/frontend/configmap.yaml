@@ -11,30 +11,38 @@ data:
         acme_ca https://acme.zerossl.com/v2/DV90
     }
     lazurune.shinshark.my.id {
-        # 1. API Routes
-        handle /api/auth* {
-            reverse_proxy http://auth-service
+        root * /srv
+        encode gzip
+
+        # 1. API Routes (Keep these at the top)
+        handle /api/auth* { 
+            reverse_proxy http://auth-service 
+        }
+        handle /api/links* { 
+            reverse_proxy http://link-management-service 
+        }
+        handle /api/analytics* { 
+            reverse_proxy http://analytics-query-service:3001 
         }
 
-        handle /api/links* {
-            reverse_proxy http://link-management-service
+        # 2. FILE SERVER (The "Smart" Fix)
+        # If the request matches a real file on disk (like favicon.png), serve it immediately.
+        @static_file {
+            file
+        }
+        handle @static_file {
+            file_server
         }
 
-        handle /api/analytics* {
-            reverse_proxy http://analytics-query-service:3001
-        }
-
-        # 2. Frontend Assets & Routes (Explicit Whitelist)
-        # We handle these explicitly so everything else can fall through to the Redirect Service
-        @frontend path / /login /register /dashboard /assets/* /favicon.ico /favicon.png
+        # 3. Frontend Routes (SPA)
+        # If it's not a file, but matches our Vue routes, serve index.html
+        @frontend path / /login /register /dashboard
         handle @frontend {
-            root * /srv
             try_files {path} /index.html
             file_server
         }
 
-        # 3. Everything else -> Redirect Service (Azure Function)
-        # This allows root-level short links (e.g., domain.com/AbCd)
+        # 4. Everything else -> Redirect Service
         handle {
             rewrite * /api{path}
             reverse_proxy https://us-func-p6ndmuotrzo5a.azurewebsites.net {
