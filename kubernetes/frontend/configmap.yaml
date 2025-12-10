@@ -26,7 +26,7 @@ data:
 
         # 2. Frontend Assets & Routes (Explicit Whitelist)
         # We handle these explicitly so everything else can fall through to the Redirect Service
-        @frontend path / /login /register /dashboard /assets/* /favicon.ico
+        @frontend path / /login /register /dashboard /assets/* /favicon.ico /favicon.png
         handle @frontend {
             root * /srv
             try_files {path} /index.html
