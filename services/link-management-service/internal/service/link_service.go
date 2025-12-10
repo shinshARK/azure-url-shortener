@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/shinshark/azure-url-shortener/services/link-management-service/internal/models"
@@ -10,14 +12,40 @@ import (
 )
 
 type LinkService struct {
-	Repo *repository.LinkRepository
+	Repo             *repository.LinkRepository
+	CacheEvictionUrl string
 }
 
-func NewLinkService(repo *repository.LinkRepository) *LinkService {
-	return &LinkService{Repo: repo}
+func NewLinkService(repo *repository.LinkRepository, cacheEvictionUrl string) *LinkService {
+	return &LinkService{
+		Repo:             repo,
+		CacheEvictionUrl: cacheEvictionUrl,
+	}
+}
+
+func (s *LinkService) evictCache(shortCode string) {
+	if s.CacheEvictionUrl == "" {
+		return
+	}
+	client := &http.Client{Timeout: 5 * time.Second}
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/%s", s.CacheEvictionUrl, shortCode), nil)
+	if err != nil {
+		fmt.Printf("Failed to create cache eviction request: %v\n", err)
+		return
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Failed to evict cache: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+		fmt.Printf("Cache eviction failed with status: %d\n", resp.StatusCode)
+	}
 }
 
 func (s *LinkService) CreateLink(req *models.CreateLinkRequest, userID *int, role string) (*models.Link, error) {
+	// ... (existing code) ...
 	// 1. Quota Check for Users
 	if role == "User" && userID != nil {
 		if req.CustomAlias != "" {
@@ -119,6 +147,9 @@ func (s *LinkService) UpdateLink(shortCode string, req *models.UpdateLinkRequest
 		return nil, err
 	}
 
+	// Evict Cache
+	go s.evictCache(shortCode)
+
 	return link, nil
 }
 
@@ -138,5 +169,12 @@ func (s *LinkService) DeleteLink(shortCode string, userID int, role string) erro
 		}
 	}
 
-	return s.Repo.DeleteLink(shortCode)
+	if err := s.Repo.DeleteLink(shortCode); err != nil {
+		return err
+	}
+
+	// Evict Cache
+	go s.evictCache(shortCode)
+
+	return nil
 }

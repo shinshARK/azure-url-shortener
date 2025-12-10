@@ -27,7 +27,7 @@ func main() {
 
 	// Initialize Layers
 	repo := repository.NewLinkRepository(db)
-	svc := service.NewLinkService(repo)
+	svc := service.NewLinkService(repo, cfg.CacheEvictionUrl)
 	h := handler.NewLinkHandler(svc)
 
 	// Initialize Gin router
