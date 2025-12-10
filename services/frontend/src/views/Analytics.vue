@@ -184,7 +184,7 @@ const processGeolocation = async (locations) => {
                 addIpToCountry(tempCountries, 'Local Network', ip, locations[ip])
                 continue
             }
-            const res = await fetch(`http://ip-api.com/json/${ip}`)
+            const res = await fetch(`https://ip-api.com/json/${ip}`)
             const geo = await res.json()
             const country = geo.status === 'success' ? geo.country : 'Unknown Location'
             addIpToCountry(tempCountries, country, ip, locations[ip])
