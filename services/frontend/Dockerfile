@@ -17,9 +17,6 @@ FROM caddy:alpine
 # Copy built assets from builder
 COPY --from=builder /app/dist /srv
 
-# Copy Caddyfile
-COPY Caddyfile /etc/caddy/Caddyfile
-
 # Expose port 80
 EXPOSE 80
 
